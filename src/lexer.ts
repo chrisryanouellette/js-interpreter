@@ -67,6 +67,14 @@ function skipWhiteSpace(l: Lexer) {
   }
 }
 
+function peekChar(l: Lexer): string | null {
+  if (l.readPosition >= l.input.length) {
+    return null;
+  } else {
+    return l.input[l.readPosition];
+  }
+}
+
 export function nextToken(l: Lexer): Token {
   let tok: Token;
 
@@ -74,7 +82,13 @@ export function nextToken(l: Lexer): Token {
 
   switch (l.ch) {
     case "=": {
-      tok = newToken("ASSIGN", l.ch);
+      if (peekChar(l) === "=") {
+        const ch = l.ch;
+        readChar(l);
+        tok = newToken("EQ", `${ch}${l.ch}`);
+      } else {
+        tok = newToken("ASSIGN", l.ch);
+      }
       break;
     }
     case ";": {
@@ -102,7 +116,13 @@ export function nextToken(l: Lexer): Token {
       break;
     }
     case "!": {
-      tok = newToken("BANG", l.ch);
+      if (peekChar(l) === "=") {
+        const ch = l.ch;
+        readChar(l);
+        tok = newToken("NOT_EQ", `${ch}${l.ch}`);
+      } else {
+        tok = newToken("BANG", l.ch);
+      }
       break;
     }
     case "/": {
